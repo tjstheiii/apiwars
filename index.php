@@ -7,6 +7,7 @@ $app->get('/', function () {
 });
 
 $app->get('/accounts', 'listAccounts');
+$app->post('/accounts', 'createAccount');
 $app->get('/accounts/:id', 'getAccount');
 $app->get('/characters', 'listCharacters');
 $app->get('/characters/:id', 'getCharacter');
@@ -42,5 +43,79 @@ function getConnection() {
   $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   return $dbh;
 }
+
+function listAccounts() {
+  $sql = "select `id`,`email_address`, `created_at` FROM Accounts ORDER BY created_at desc";
+  try {
+    $db = getConnection();
+    $stmt = $db->query($sql);
+    $accounts = $stmt->fetchAll(PDO::FETCH_OBJ);
+    $db = null;
+    echo '{"accounts": ' . json_encode($accounts) . '}';
+  }
+  catch(PDOException $e){
+    echo '{"error": {"text": '. $e->getMessage() .'}}';
+  }
+}
+
+function createAccount() {
+  $request = Slim::getInstance()->request();
+  $account = json_decode($request->getBody());
+  $sql = "insert into accounts (email_address, password, currency_gold, currency_energy, currency_actionpts, currency_gems, stats_apicalls) values (:email_address, :password, :gold, :energy, :actionpts, :gems, :apicalls)";
+  try {
+    $db = getConnection();
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam("email_address", $account->email_address);
+    $stmt->bindParam("password", $account->password);
+    $stmt->bindParam("gold", 100);
+    $stmt->bindParam("energy", 100);
+    $stmt->bindParam("actionpts", 1000);
+    $stmt->bindParam("gems", 0);
+    $stmt->bindParam("apicalls", 0);
+    $stmt->execute();
+    $account->id = $db->lastInsertId();
+    $db=null;
+    echo json_encode($account);    
+  } catch(PDOException $e) {
+    echo '{"error": {"text": '. $e->getMessage() .'}}';
+  }
+}
+
+function getAccount() {
+  $sql = "select * from accounts where id=:id";
+  try {
+    $db = getConnection();
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam("id", $id);
+    $stmt->execute();
+    $account = $stmt->fetchObject();
+    $db = null;
+    echo json_encode($account);
+  } catch(PDOException $e) {
+    echo '{"error": {"text": ' . $e->getMessage() . '}}';
+  }
+}
+
+function listCharacters(){}
+function getCharacter(){}
+function modifyCharacter(){}
+function listParties(){}
+function createParty(){}
+function getParty(){}
+function modifyParty(){}
+function listEquipment(){}
+function getEquipment(){}
+function listItems(){}
+function getItem(){}
+function listExplorations(){}
+function createExploration(){}
+function getExploration(){}
+function listZones(){}
+function getZone(){}
+function listEnemies(){}
+function getEnemy(){}
+function listFights(){}
+function createFight(){}
+function getFight(){}
 
 ?>
