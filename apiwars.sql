@@ -1,9 +1,8 @@
 /*
 SQLyog Community v11.32 (32 bit)
-MySQL - 5.6.17-log : Database - apiwars
+MySQL - 5.5.38-0ubuntu0.14.04.1 : Database - apiwars
 *********************************************************************
-*/
-
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -23,9 +22,10 @@ DROP TABLE IF EXISTS `Accounts`;
 
 CREATE TABLE `Accounts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `username` varchar(250) NOT NULL,
   `email_address` varchar(250) NOT NULL,
-  `email_validated` tinyint(1) DEFAULT 0,
+  `email_validated` tinyint(1) DEFAULT '0',
   `email_key` varchar(250) NOT NULL,
   `private_key` varchar(250) NOT NULL,
   `session_key` varchar(250) DEFAULT NULL,
@@ -35,9 +35,7 @@ CREATE TABLE `Accounts` (
   `currency_gems` int(10) unsigned NOT NULL,
   `stats_apicalls` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Accounts` */
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 /*Table structure for table `Characters` */
 
@@ -82,8 +80,6 @@ CREATE TABLE `Characters` (
   CONSTRAINT `char_to_equip_accessory` FOREIGN KEY (`equip_accessory`) REFERENCES `Equipment` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Characters` */
-
 /*Table structure for table `Characters_Type_DM` */
 
 DROP TABLE IF EXISTS `Characters_Type_DM`;
@@ -93,8 +89,6 @@ CREATE TABLE `Characters_Type_DM` (
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Characters_Type_DM` */
 
 /*Table structure for table `Enemies` */
 
@@ -113,7 +107,7 @@ CREATE TABLE `Enemies` (
   `stats_def` int(10) unsigned NOT NULL,
   `stats_crit` int(10) unsigned NOT NULL,
   `stats_armor` int(10) unsigned NOT NULL,
-  `closes` timestamp NOT NULL,
+  `closes` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `statusid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `enemies_to_account` (`accountid`),
@@ -123,8 +117,6 @@ CREATE TABLE `Enemies` (
   CONSTRAINT `enemies_to_type` FOREIGN KEY (`typeid`) REFERENCES `Enemies_Type_DM` (`typeid`),
   CONSTRAINT `enemies_to_status` FOREIGN KEY (`statusid`) REFERENCES `Enemies_Status_DM` (`statusid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Enemies` */
 
 /*Table structure for table `Enemies_Status_DM` */
 
@@ -136,8 +128,6 @@ CREATE TABLE `Enemies_Status_DM` (
   PRIMARY KEY (`statusid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Enemies_Status_DM` */
-
 /*Table structure for table `Enemies_Type_DM` */
 
 DROP TABLE IF EXISTS `Enemies_Type_DM`;
@@ -147,8 +137,6 @@ CREATE TABLE `Enemies_Type_DM` (
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Enemies_Type_DM` */
 
 /*Table structure for table `Equipment` */
 
@@ -172,8 +160,6 @@ CREATE TABLE `Equipment` (
   CONSTRAINT `equip_to_type` FOREIGN KEY (`typeid`) REFERENCES `Equipment_Type_DM` (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Equipment` */
-
 /*Table structure for table `Equipment_Type_DM` */
 
 DROP TABLE IF EXISTS `Equipment_Type_DM`;
@@ -184,8 +170,6 @@ CREATE TABLE `Equipment_Type_DM` (
   PRIMARY KEY (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Equipment_Type_DM` */
-
 /*Table structure for table `Explorations` */
 
 DROP TABLE IF EXISTS `Explorations`;
@@ -193,7 +177,7 @@ DROP TABLE IF EXISTS `Explorations`;
 CREATE TABLE `Explorations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `accountid` int(10) unsigned NOT NULL,
-  `timestamp` timestamp NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `zoneid` int(10) unsigned NOT NULL,
   `partyid` int(10) unsigned NOT NULL,
   `found_zoneid` int(10) unsigned DEFAULT NULL,
@@ -214,8 +198,6 @@ CREATE TABLE `Explorations` (
   CONSTRAINT `explor_to_foundenemy` FOREIGN KEY (`found_enemyid`) REFERENCES `Enemies` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Explorations` */
-
 /*Table structure for table `Fights` */
 
 DROP TABLE IF EXISTS `Fights`;
@@ -223,7 +205,7 @@ DROP TABLE IF EXISTS `Fights`;
 CREATE TABLE `Fights` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `accountid` int(10) unsigned NOT NULL,
-  `timestamp` timestamp NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `enemyid` int(10) unsigned NOT NULL,
   `partyid` int(10) unsigned NOT NULL,
   `resultid` int(10) unsigned NOT NULL,
@@ -246,8 +228,6 @@ CREATE TABLE `Fights` (
   CONSTRAINT `fights_to_party` FOREIGN KEY (`partyid`) REFERENCES `Items` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Fights` */
-
 /*Table structure for table `Fights_Result_DM` */
 
 DROP TABLE IF EXISTS `Fights_Result_DM`;
@@ -257,8 +237,6 @@ CREATE TABLE `Fights_Result_DM` (
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`resultid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Fights_Result_DM` */
 
 /*Table structure for table `Items` */
 
@@ -276,8 +254,6 @@ CREATE TABLE `Items` (
   CONSTRAINT `items_to_type` FOREIGN KEY (`typeid`) REFERENCES `Items_Type_DM` (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Items` */
-
 /*Table structure for table `Items_Accounts_Assoc` */
 
 DROP TABLE IF EXISTS `Items_Accounts_Assoc`;
@@ -292,8 +268,6 @@ CREATE TABLE `Items_Accounts_Assoc` (
   CONSTRAINT `itemaccount_to_account` FOREIGN KEY (`accountid`) REFERENCES `Accounts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Items_Accounts_Assoc` */
-
 /*Table structure for table `Items_Type_DM` */
 
 DROP TABLE IF EXISTS `Items_Type_DM`;
@@ -303,8 +277,6 @@ CREATE TABLE `Items_Type_DM` (
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Items_Type_DM` */
 
 /*Table structure for table `Parties` */
 
@@ -336,8 +308,6 @@ CREATE TABLE `Parties` (
   CONSTRAINT `parties_to_status` FOREIGN KEY (`statusid`) REFERENCES `Parties_Status_DM` (`statusid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Parties` */
-
 /*Table structure for table `Parties_Status_DM` */
 
 DROP TABLE IF EXISTS `Parties_Status_DM`;
@@ -347,8 +317,6 @@ CREATE TABLE `Parties_Status_DM` (
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`statusid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Parties_Status_DM` */
 
 /*Table structure for table `Zones` */
 
@@ -365,8 +333,6 @@ CREATE TABLE `Zones` (
   CONSTRAINT `zones_to_type` FOREIGN KEY (`typeid`) REFERENCES `Zones_Type_DM` (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*Data for the table `Zones` */
-
 /*Table structure for table `Zones_Accounts_Assoc` */
 
 DROP TABLE IF EXISTS `Zones_Accounts_Assoc`;
@@ -374,14 +340,12 @@ DROP TABLE IF EXISTS `Zones_Accounts_Assoc`;
 CREATE TABLE `Zones_Accounts_Assoc` (
   `zoneid` int(10) unsigned NOT NULL,
   `accountid` int(10) unsigned NOT NULL,
-  `closes` timestamp NOT NULL,
+  `closes` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`zoneid`,`accountid`),
   KEY `zoneaccount_to_account` (`accountid`),
   CONSTRAINT `zoneaccount_to_zone` FOREIGN KEY (`zoneid`) REFERENCES `Zones` (`id`),
   CONSTRAINT `zoneaccount_to_account` FOREIGN KEY (`accountid`) REFERENCES `Accounts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Zones_Accounts_Assoc` */
 
 /*Table structure for table `Zones_Type_DM` */
 
@@ -392,8 +356,6 @@ CREATE TABLE `Zones_Type_DM` (
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`typeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*Data for the table `Zones_Type_DM` */
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
