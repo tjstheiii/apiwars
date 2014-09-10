@@ -2,7 +2,8 @@
 SQLyog Community v11.32 (32 bit)
 MySQL - 5.6.17-log : Database - apiwars
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -22,8 +23,12 @@ DROP TABLE IF EXISTS `Accounts`;
 
 CREATE TABLE `Accounts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(250) NOT NULL,
   `email_address` varchar(250) NOT NULL,
-  `password` varchar(250) NOT NULL,
+  `email_validated` tinyint(1) DEFAULT 0,
+  `email_key` varchar(250) NOT NULL,
+  `private_key` varchar(250) NOT NULL,
+  `session_key` varchar(250) DEFAULT NULL,
   `currency_gold` int(10) unsigned NOT NULL,
   `currency_energy` int(10) unsigned NOT NULL,
   `currency_actionpts` int(10) unsigned NOT NULL,

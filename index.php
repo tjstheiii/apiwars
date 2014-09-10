@@ -9,6 +9,8 @@ $app->get('/', function () {
 $app->get('/accounts', 'listAccounts');
 $app->post('/accounts', 'createAccount');
 $app->get('/accounts/:id', 'getAccount');
+$app->put('/accounts/:id', 'modifyAccount');
+$app->post('accounts/:id/sessions', 'createSession');
 $app->get('/characters', 'listCharacters');
 $app->get('/characters/:id', 'getCharacter');
 $app->put('/characters/:id', 'modifyCharacter'); // equip equipment
@@ -58,24 +60,39 @@ function listAccounts() {
   }
 }
 
+function modifyAccount() {
+  $request = Slim::getInstance()->request();
+  $new_account = json_decode($request->getBody());
+  $sql = "select * from accounts where id=:id";
+}
+
 function createAccount() {
   $request = Slim::getInstance()->request();
   $account = json_decode($request->getBody());
-  $sql = "insert into accounts (email_address, password, currency_gold, currency_energy, currency_actionpts, currency_gems, stats_apicalls) values (:email_address, :password, :gold, :energy, :actionpts, :gems, :apicalls)";
+  $sql = "insert into accounts
+          (username, email_address, email_validated, private_key, currency_gold, currency_energy,
+          currency_actionpts, currency_gems, stats_apicalls)
+          values (:username, :email_address, :email_validated, :private_key, :gold, :energy, :actionpts, :gems, :apicalls)";
   try {
     $db = getConnection();
     $stmt = $db->prepare($sql);
+    $account->private_key = bin2hex(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM));
+    $account->email_validated = 0;
+    $stmt->bindParam("username", $account->username);
     $stmt->bindParam("email_address", $account->email_address);
-    $stmt->bindParam("password", $account->password);
+    $stmt->bindParam("email_validated", $account->email_validated);
+    $stmt->bindParam("email_key", bin2hex(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM)));
+    $stmt->bindParam("private_key", $account->private_key);
     $stmt->bindParam("gold", 100);
     $stmt->bindParam("energy", 100);
-    $stmt->bindParam("actionpts", 1000);
+    $stmt->bindParam("actionpts", 100);
     $stmt->bindParam("gems", 0);
     $stmt->bindParam("apicalls", 0);
     $stmt->execute();
     $account->id = $db->lastInsertId();
+    // email $account->email_address their $account->email_key
     $db=null;
-    echo json_encode($account);    
+    echo json_encode($account);
   } catch(PDOException $e) {
     echo '{"error": {"text": '. $e->getMessage() .'}}';
   }
