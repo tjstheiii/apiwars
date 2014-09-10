@@ -1,5 +1,6 @@
 <?php
 require 'vendor/autoload.php';
+use Slim\Slim;
 
 $app = new \Slim\Slim();
 $app->get('/', function () {
@@ -10,7 +11,6 @@ $app->get('/accounts', 'listAccounts');
 $app->post('/accounts', 'createAccount');
 $app->get('/accounts/:id', 'getAccount');
 $app->put('/accounts/:id', 'modifyAccount');
-$app->post('accounts/:id/sessions', 'createSession');
 $app->get('/characters', 'listCharacters');
 $app->get('/characters/:id', 'getCharacter');
 $app->put('/characters/:id', 'modifyCharacter'); // equip equipment
@@ -37,10 +37,11 @@ $app->run();
 
 
 function getConnection() {
-  $dbhost="apiwars-lab.cb45msfqsg7e.us-east-1.rds.amazonaws.com";
-  $dbuser="apiwars";
-  $dbpass="motherfucker99";
-  $dbname="apiwars";
+  $config = parse_ini_file("conf/apiwars.ini", true);
+  $dbhost = $config['db_' . getenv('apploc')]['dbhost'];
+  $dbuser = $config['db_' . getenv('apploc')]['dbuser'];
+  $dbpass = $config['db_' . getenv('apploc')]['dbpass'];  
+  $dbname = "apiwars";
   $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser, $dbpass);
   $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   return $dbh;
@@ -63,31 +64,26 @@ function listAccounts() {
 function modifyAccount() {
   $request = Slim::getInstance()->request();
   $new_account = json_decode($request->getBody());
-  $sql = "select * from accounts where id=:id";
+  $sql = "select * from Accounts where id=:id";
 }
 
 function createAccount() {
   $request = Slim::getInstance()->request();
   $account = json_decode($request->getBody());
-  $sql = "insert into accounts
-          (username, email_address, email_validated, private_key, currency_gold, currency_energy,
-          currency_actionpts, currency_gems, stats_apicalls)
-          values (:username, :email_address, :email_validated, :private_key, :gold, :energy, :actionpts, :gems, :apicalls)";
+  $sql = "insert into Accounts
+          (username, email_address, email_validated, email_key, private_key, currency_gold, 
+          currency_energy, currency_actionpts, currency_gems, stats_apicalls)
+          values (:username, :email_address, :email_validated, :email_key, :private_key, 100, 100, 100, 0, 0)";
   try {
     $db = getConnection();
     $stmt = $db->prepare($sql);
-    $account->private_key = bin2hex(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM));
+    $account->private_key = hash('sha256', openssl_random_pseudo_bytes(32));
     $account->email_validated = 0;
     $stmt->bindParam("username", $account->username);
     $stmt->bindParam("email_address", $account->email_address);
     $stmt->bindParam("email_validated", $account->email_validated);
-    $stmt->bindParam("email_key", bin2hex(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM)));
+    $stmt->bindParam("email_key", hash('sha256', openssl_random_pseudo_bytes(32)));
     $stmt->bindParam("private_key", $account->private_key);
-    $stmt->bindParam("gold", 100);
-    $stmt->bindParam("energy", 100);
-    $stmt->bindParam("actionpts", 100);
-    $stmt->bindParam("gems", 0);
-    $stmt->bindParam("apicalls", 0);
     $stmt->execute();
     $account->id = $db->lastInsertId();
     // email $account->email_address their $account->email_key
@@ -99,7 +95,7 @@ function createAccount() {
 }
 
 function getAccount() {
-  $sql = "select * from accounts where id=:id";
+  $sql = "select * from Accounts where id=:id";
   try {
     $db = getConnection();
     $stmt = $db->prepare($sql);

@@ -1,0 +1,94 @@
+currencies:
+gold -- used to buy items.  ways to earn: looting mobs, castle economy, completing quests
+actionpts -- used to make further api calls (actions). ways to earn: over time, completing quests
+energy -- used to fight mob, or explore dungeon.  ways to earn: over time, resting, food
+
+items:
+* chest (lvl) -- contains gold, other items
+* equipment piece
+* equipment (lvl)
+* character piece
+* food - gives energy
+* med kits - gives actionpts
+* scrolls - buffs character stats for limitted time
+* castle materials - improve castle
+
+actions: (these take action points)
+* get quest
+* explore (finds mob, or dungeon, or castle[pvp])
+* fight mob (item)
+* enter dungeon
+* loot mob
+* use item
+* sell item
+* rest
+* set party
+* equip to char
+* enhance castle
+
+party -- array of 5 characters
+
+character attributes:
+* level
+* tier (1-6?)
+* class (hunter, mage, warrior)
+* hitpoints
+* atk
+* crit
+* def
+* armor
+
+equipment (tier[1-6], lvl?):
+* helm
+* chest
+* boots
+* belt
+* weapon
+* trinket
+
+castle attributes [pvp]:
+* fortitude (hps)
+* def
+* atk
+
+castle improvements:
+* wall (picket -> fortress) [def]
+* militia (archers -> artillery) [atk]
+* food store (granery -> grocery) [population -> fortitude]
+* economy (trade post -> stock market) [gold rate]
+* guild portal? [allows formation of guild]
+
+
+
+
+API DESIGN:
+CREATE (POST)
+READ   (GET)
+UPDATE (PUT)
+DELETE (DELETE)
+
+/accounts      - (GET)  lists the accounts you have created (only 1 by definition)
+                 (POST) creates an account object
+                 ?params - userid(:id), password, emailaddress, created, updated, used, status
+/accounts/#### - (GET)    lists the status details for an account
+                 (PUT)    updates account details (password/emailaddress)
+		 (DELETE) deletes the account
+/characters
+/characters/####
+/characters/####/equipment
+/items/
+/items/####
+/equipment/
+/equipment/####
+/parties/
+/parties/####
+/zones/
+/zones/####
+/enemies/
+/enemies/####
+/quests/
+/quests/####
+
+pseudo actions:
+/explorations/ - finds zones/enemys
+/fights/ - battles enemys
