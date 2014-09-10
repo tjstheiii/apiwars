@@ -94,7 +94,7 @@ function createAccount() {
   }
 }
 
-function getAccount() {
+function getAccount($id) {
   $sql = "select * from Accounts where id=:id";
   try {
     $db = getConnection();
