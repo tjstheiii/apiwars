@@ -1,44 +1,110 @@
 currencies:
-gold -- used to buy items.  ways to earn: looting mobs, castle economy, completing quests
-actionpts -- used to make further api calls (actions). ways to earn: over time, completing quests
-energy -- used to fight mob, or explore dungeon.  ways to earn: over time, resting, food
+ - gold:
+     use: buying items
+     earn_by:
+      - looting mobs
+      - castle economy (over time)
+      - completing quests
+ - energy:
+     use:
+      - fighting mobs
+      - exploring dungeons
+     earn_by:
+      - regen (over time)
+      - resting (accelerated regen)
+      - food (instant regen)
+ - action_points:
+     use: making api calls (actions)
+     earn_by:
+      - regen (over time)
+      - completing quests
 
 items:
-* chest (lvl) -- contains gold, other items
-* equipment piece
-* equipment (lvl)
-* character piece
-* food - gives energy
-* med kits - gives actionpts
-* scrolls - buffs character stats for limitted time
-* castle materials - improve castle
+ - chest (lvl)
+     description: contains gold, other items
+     actions: open_chest, sell_item
+ - equipment piece
+     description: can be combined to make equipment
+     actions: combine_equipment, sell_item
+ - equipment (lvl)
+     description: can be equiped for stat enhancement
+     actions: equip, sell_item
+ - character piece
+     description: can be combined to make character
+     actions: combine_character, sell_item
+ - food (energy_value)
+     description: can be consumed for energy
+     actions: use_item, sell_item
+ - scrolls (stat, duration)
+     description: can be consumed for stat buff
+     actions: use_item, sell_item
+ - castle materials - improve castle
+     description: can be used to upgrade castle
+     actions: use_item, sell_item
 
-actions: (these take action points)
-* get quest
-* explore (finds mob, or dungeon, or castle[pvp])
-* fight mob (item)
-* enter dungeon
-* loot mob
-* use item
-* sell item
-* rest
-* set party
-* equip to char
-* enhance castle
+actions: 
+ - get quest
+     description: get a new quest, based on party avg lvl
+     examples:
+      - fight 20 mobs
+      - explore 20 zones
+      - consume 20 food
+      - consume 10 scrolls
+      - upgrade castle 5 times
+ - explore zone
+     description: finds mobs, or dungeons, based on party avg lvl
+ - fight mob
+     description: finds item(s), if successful
+ - enter dungeon
+     description: finds 'special' zone, with higher drop rates
+ - use item
+     description: uses an item (see item descriptions)
+ - sell item
+     description: sells an item for gold (see item descriptions)
+ - rest
+     description: accellerates energy regen
+ - set party
+     description: defines which characters make up the active party
+ - equip to char
+     description: defines which equipment is active on a character
 
 party -- array of 5 characters
 
 character attributes:
-* level
-* tier (1-6?)
-* class (hunter, mage, warrior)
-* hitpoints
-* atk
-* crit
-* def
-* armor
+ - level
+     description: |
+       each character gets a starting level when combined/found,
+       level is computed based on exp_total,
+       level is used as a multiplier in computing character stats,       
+ - tier (1-6?)
+     description: |
+       rarity of character,
+       tier is used as a multiplier in computing character stats,
+ - exp_total
+     description: |
+       ever increasing counter of total exp accumulated by character,
+       used to compute level and exp_to_next_level
+ - class 
+     examples:
+      - warrior
+      - hunter
+      - mage
+      - rogue
+      - support
+ - hitpoints
+     description: character health; issues result when this is 0
+ - atk_base
+ - crit_base
+ - def_base
+ - armor_base
 
-equipment (tier[1-6], lvl?):
+equipment attributes:
+* tier (1-6?)
+* level
+* primary stat modifier (+30 atk)
+* secondary stat modifier (+10 def)
+
+equipment slots:
 * helm
 * chest
 * boots
@@ -73,9 +139,11 @@ DELETE (DELETE)
 /accounts/#### - (GET)    lists the status details for an account
                  (PUT)    updates account details (password/emailaddress)
 		 (DELETE) deletes the account
-/characters
-/characters/####
+/characters                - (GET)  lists the characters you have available
+                             (POST) creates a character (consumes character pieces?)
+/characters/####           - (GET)  lists status details about specific character
 /characters/####/equipment
+/characters/####/items
 /items/
 /items/####
 /equipment/
